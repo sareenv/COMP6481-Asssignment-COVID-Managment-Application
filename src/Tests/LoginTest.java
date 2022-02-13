@@ -1,11 +1,18 @@
 package Tests;
 
+//
+// Assignment 1
+// © Vinayak Sareen.
+// Written by: Vinayak Sareen - SID: 40186182
+//
+
 import Main.Main;
 import org.junit.Test;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 import static org.junit.Assert.*;
+
 
 public class LoginTest {
 
@@ -21,7 +28,5 @@ public class LoginTest {
         snc.close();
         assertEquals(result, false);
     }
-
-
 
 }

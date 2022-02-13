@@ -9,12 +9,6 @@ package Main;
 import java.util.ArrayList;
 import java.util.Objects;
 
-enum VaccineBrand {
-    Moderna,
-    Pfizer,
-    COVISHIED,
-    COVAXIN
-}
 
 class Vaccine {
     static int vaccineCnt = 0;
@@ -23,7 +17,6 @@ class Vaccine {
     private String expiryDate;
     private final long vaccineId;
     private double price;
-
 
     @Override
     public String toString() {
@@ -44,12 +37,13 @@ class Vaccine {
         vaccineCnt += 1;
     }
 
+    // copy constructor.
     public Vaccine(Vaccine v) {
         this.vaccineId = v.vaccineId;
         this.price = v.price;
         this.expiryDate = v.expiryDate;
         this.brand = v.brand;
-        this.dose = dose;
+        this.dose = v.dose;
         vaccineCnt += 1;
     }
 
@@ -94,7 +88,7 @@ class Vaccine {
     }
 
     public static ArrayList<Vaccine> findVaccineByVaccineBrand(ArrayList<Vaccine> vaccines,
-                                                               VaccineBrand brand) {
+                                                                    VaccineBrand brand) {
         ArrayList<Vaccine> vaccineList = new ArrayList<Vaccine>();
         for (Vaccine v: vaccines) {
             if (v != null && v.brand == brand) {

@@ -6,12 +6,16 @@ package Main;
 // Written by: Vinayak Sareen - SID: 40186182
 //
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
 
     private int maxVaccineCount;
+    private static int passwordGroupAttempts = 0;
     private Vaccine[] vaccines;
+    static int last_vaccineIndex;
 
     public void registerVaccine(Scanner snc) {
         System.out.println("Please enter new vaccination count");
@@ -24,7 +28,8 @@ public class Main {
         if (currentCapacity >= newVaccineCount) {
             for(int i = 0; i< newVaccineCount; i++) {
                 Vaccine vaccine = inputVaccine(snc, false);
-                this.vaccines[i] = vaccine;
+                this.vaccines[last_vaccineIndex] = vaccine;
+                last_vaccineIndex++;
             }
         } else {
             int currentAvailability = Math.max(currentCapacity, 0);
@@ -37,6 +42,7 @@ public class Main {
     private Vaccine inputVaccine(Scanner snc, boolean isUpdation) {
         System.out.println(isUpdation ? "Please provide the update details" : "Please enter the " +
                 "new vaccine details");
+        System.out.println("----------------------");
         System.out.println("Please enter the vaccine id");
         long vaccineID = snc.nextLong();
 
@@ -46,7 +52,7 @@ public class Main {
         System.out.println("Please enter the price for the vaccine");
         double price = snc.nextDouble();
         System.out.println("Please enter the expiry date");
-        String expiryDate = snc.nextLine();
+        String expiryDate = snc.next();
         return new Vaccine(selectedBrand,
             dose, expiryDate, vaccineID, price);
     }
@@ -94,8 +100,16 @@ public class Main {
             }
             passwordAttempt++;
         }
+
+        if (passwordGroupAttempts == 4) {
+            System.out.println("Program detected suspicious " +
+                    "activities and will terminate immediately!");
+            System.exit(1);
+        }
+
         String passwordStatus = isPassword ? "Correct Password" : "Wrong password " +
                 "even after 3 tries";
+        passwordGroupAttempts++;
         System.out.println(passwordStatus);
         return isPassword;
     }
@@ -134,8 +148,16 @@ public class Main {
                         int vaccine_dose = snc.nextInt();
                         vaccine.setDose(vaccine_dose);
                         System.out.println("Successfully changed " +
-                                "dose of this vaccine");
-                        continue;
+                                "dose of this vaccine Do you still want to " +
+                                "continue editing ? Y/N :");
+                        System.out.println("Please select your option: ");
+                        String option = snc.next();
+                        if (option.equals("N") || option.equals("n")) {
+                            break;
+                        } else {
+                            System.out.println("Edit more details");
+                            updateVaccineDetails(snc);
+                        }
 
                     case 3:
                         System.out.println("Editing the expiry date of the vaccine");
@@ -143,7 +165,16 @@ public class Main {
                         vaccine.setExpiryDate(vaccine_expiry);
                         System.out.println("Successfully changed " +
                                 "expiry of the vaccine");
-                        continue;
+
+                        System.out.println("Please select your option: ");
+                        String option1 = snc.next();
+                        if (option1.equals("N") || option1.equals("n")) {
+                            break;
+                        } else {
+                            System.out.println("Edit more details");
+                            updateVaccineDetails(snc);
+                        }
+
 
                     case 4:
                         System.out.println("Editing the price of the vaccine");
@@ -151,6 +182,15 @@ public class Main {
                         vaccine.setPrice(price);
                         System.out.println("Successfully changed " +
                                 "price of the vaccine");
+                        System.out.println("Please select your option: ");
+                        String option2 = snc.next();
+                        if (option2.equals("N") || option2.equals("n")) {
+                            break;
+                        } else {
+                            System.out.println("Edit more details");
+                            updateVaccineDetails(snc);
+                        }
+
                         continue;
 
                     case 5:
@@ -169,7 +209,20 @@ public class Main {
                     " \n Would you like to register the vaccine, Y OR N: ");
             boolean isInputCorrect  = false;
             while (!isInputCorrect) {
+                String option = snc.next();
+                if (option.equals("Y") || option.equals("y") || option.equals("N")
+                        || option.equals("n") ) {
+                    isInputCorrect = true;
 
+                    if (option.equals("Y") || option.equals("y")) {
+                        Vaccine vaccine = inputVaccine(snc, false);
+                        // now need to calculate the index of the last index
+                        System.out.println("last vaccine index was " + last_vaccineIndex);
+                        vaccines[last_vaccineIndex] = vaccine;
+                        last_vaccineIndex++;
+                    }
+
+                }
             }
         }
     }
@@ -203,13 +256,29 @@ public class Main {
                     updateVaccineDetails(snc);
                     break;
                 case 3:
-                    System.out.println("3 is pressed");
+                    System.out.println("Filter the vaccines based on the brand names ");
                     isWrongOptionSelected = false;
+                    System.out.println("Please select the vaccine brand");
+                    VaccineBrand brand = selectBrandOption(snc);
+                    ArrayList<Vaccine> vaccines1 = new ArrayList<Vaccine>
+                            (Arrays.asList(vaccines));
+                    ArrayList<Vaccine> results =
+                            Vaccine.findVaccineByVaccineBrand(vaccines1, brand);
+                    for (Vaccine v: results) {
+                        System.out.println(v);
+                    }
                     break;
                 case 4:
-                    System.out.println("4 is pressed");
+                    System.out.println("Filter the vaccine by price ");
                     isWrongOptionSelected = false;
+                    System.out.println("Please enter the upper price amount ");
+                    double amount = snc.nextDouble();
+                    ArrayList<Vaccine> result = Vaccine.findCheaperThan(vaccines, amount);
+                    for (Vaccine v: result) {
+                        System.out.println(v);
+                    }
                     break;
+
                 case 5:
                     System.out.println("Quit option is selected: " +
                             "Shutting the system down");
@@ -230,7 +299,9 @@ public class Main {
         System.out.println("Please enter the amount of Vaccines store may contain 🏪");
         Main driver = new Main();
         Scanner snc = new Scanner(System.in);
+        last_vaccineIndex = 0;
         driver.maxVaccineCount = snc.nextInt();
+
         driver.vaccines = new Vaccine[driver.maxVaccineCount];
         while(true) {
             driver.displayMenu(snc);
